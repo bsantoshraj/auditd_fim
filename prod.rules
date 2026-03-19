@@ -1,0 +1,130 @@
+#############################################
+# Linux Auditd – Low Noise FIM Profile
+# Optimized for SIEM (Chronicle)
+#############################################
+
+############################
+# 0. Global audit settings
+############################
+
+-D
+-b 8192
+-f 1
+
+
+#############################################
+# 1. Critical identity & privilege config
+#############################################
+
+-w /etc/passwd      -p wa -k fim.identity
+-w /etc/shadow      -p wa -k fim.identity
+-w /etc/group       -p wa -k fim.identity
+-w /etc/gshadow     -p wa -k fim.identity
+
+-w /etc/sudoers     -p wa -k fim.sudo
+-w /etc/sudoers.d   -p wa -k fim.sudo
+
+-w /etc/ssh/sshd_config -p wa -k fim.ssh
+
+
+#############################################
+# 2. Persistence mechanisms (focused)
+#############################################
+
+-w /etc/cron.d       -p wa -k fim.cron
+-w /var/spool/cron   -p wa -k fim.cron
+
+-w /etc/systemd/system -p wa -k fim.systemd
+
+
+#############################################
+# 3. Boot integrity (minimal but important)
+#############################################
+
+-w /boot -p wa -k fim.boot
+
+
+#############################################
+# 4. File deletion / replacement (high signal)
+#############################################
+
+-a always,exit -F arch=b64 -S rename,unlink,unlinkat,renameat \
+-F auid>=1000 -F auid!=4294967295 -k fim.delete
+
+
+#############################################
+# 5. Privilege escalation via permission bits
+#############################################
+
+# SUID creation (ATTACKER ZONES ONLY)
+-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat \
+-F a2&04000=04000 \
+-F dir=/tmp -F auid>=1000 -k fim.suid
+
+-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat \
+-F a2&04000=04000 \
+-F dir=/home -F auid>=1000 -k fim.suid
+
+-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat \
+-F a2&04000=04000 \
+-F dir=/var/tmp -F auid>=1000 -k fim.suid
+
+
+# SGID (optional but useful)
+-a always,exit -F arch=b64 -S chmod,fchmod,fchmodat \
+-F a2&02000=02000 \
+-F dir=/tmp -F auid>=1000 -k fim.sgid
+
+
+#############################################
+# 6. Suspicious execution (ATTACK SURFACE)
+#############################################
+
+-a always,exit -F arch=b64 -S execve \
+-F dir=/tmp -F auid>=1000 -k exec.tmp
+
+-a always,exit -F arch=b64 -S execve \
+-F dir=/dev/shm -F auid>=1000 -k exec.shm
+
+-a always,exit -F arch=b64 -S execve \
+-F dir=/var/tmp -F auid>=1000 -k exec.vartmp
+
+
+#############################################
+# 7. Privilege escalation (runtime detection)
+#############################################
+
+# User → root transition (VERY HIGH SIGNAL)
+-a always,exit -F arch=b64 -S execve \
+-F euid=0 -F auid>=1000 -F auid!=4294967295 \
+-k exec.priv_esc
+
+
+#############################################
+# 8. Noise suppression (ESSENTIAL)
+#############################################
+
+# Package managers
+-a never,exit -F exe=/usr/bin/apt
+-a never,exit -F exe=/usr/bin/apt-get
+-a never,exit -F exe=/usr/bin/dpkg
+-a never,exit -F exe=/usr/bin/yum
+-a never,exit -F exe=/usr/bin/dnf
+-a never,exit -F subj_type=rpm_t
+
+# Config mgmt / automation
+-a never,exit -F exe=/usr/bin/cloud-init
+-a never,exit -F exe=/opt/puppetlabs/bin/puppet
+-a never,exit -F exe=/usr/bin/ansible
+
+# Containers (huge noise reduction if applicable)
+-a never,exit -F exe=/usr/bin/dockerd
+-a never,exit -F exe=/usr/bin/containerd
+-a never,exit -F exe=/usr/bin/kubelet
+
+
+#############################################
+# 9. Lock ruleset
+#############################################
+
+-e 2
