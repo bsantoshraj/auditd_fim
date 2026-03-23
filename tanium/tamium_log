@@ -1,0 +1,19 @@
+046|backlog 0
+047|backlog_wait_time 60000
+048|backlog_wait_time_actual 0
+049|enabled 1
+050|failure 1
+051|pid 917
+052|rate_limit 0
+053|backlog_limit 8192
+054|lost 0
+055|backlog 149
+056|backlog_wait_time 60000
+057|backlog_wait_time_actual 0
+058|[auditd-fim] Rules loaded successfully
+059|[auditd-fim] Sensor deployed to /opt/Tanium/TaniumClient/sizing-sensor.sh
+060|[auditd-fim] Active rules: 36
+061|[auditd-fim] Deployment complete. Allow 24-48h bake time before collecting sizing data.
+062|2026-03-23T05:59:59Z|Completed.
+063|2026-03-23T05:59:59Z|Action Timing: 44ms
+064|2026-03-23T05:59:59Z|Action Exit Code: 0
