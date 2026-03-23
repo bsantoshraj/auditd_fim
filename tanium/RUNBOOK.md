@@ -62,6 +62,42 @@ Run one Action per role so nodes get tagged correctly:
 
 ---
 
+## Step 3b: Validate Rules via Test Suite
+
+Run the test suite on deployed endpoints to confirm all rules are firing correctly.
+
+1. **Create package** `auditd-fim-tests`:
+   - **Name:** `auditd-fim-tests`
+   - **Command:** `bash run-tests.sh`
+   - **Expire after:** 10 minutes
+   - Upload these files:
+     - `run-tests.sh`
+     - `testsuite/` (entire directory including `lib/` and `tests/`)
+
+2. **Deploy Action:**
+   - **Package:** `auditd-fim-tests`
+   - **Target:** your FIM Computer Group
+   - **Schedule:** Run once
+
+3. **Verify results:**
+   - Action status should show Exit Code **0** on all targets
+   - Check action logs for `[auditd-fim-test] ALL TESTS PASSED`
+   - If any tests fail, review the action log for `[FAIL]` lines — the test name indicates which rule key is not firing
+
+4. **Troubleshooting failures:**
+
+   | Failed test | Likely cause |
+   |---|---|
+   | `01_fim_tmp` (fim.delete) | Rules not loaded or `never,exit` excluding the test user |
+   | `02_suid` (fim.perm) | chmod syscall rule missing or auid filter too restrictive |
+   | `03_exec_tmp` (exec.tmp) | execve rule not loaded for /tmp |
+   | `04_priv_esc` (exec.priv_esc) | No real user context (SUDO_USER not set) |
+   | `05_identity` (fim.identity) | /etc/passwd watch not loaded |
+   | `06_bin_tamper` (fim.usrbin) | /usr/bin watch not loaded |
+   | `07_sbin_tamper` (fim.usrsbin) | /usr/sbin watch not loaded |
+
+---
+
 ## Step 4: Wait for Bake Period
 
 Allow **24-48 hours** for the endpoints to generate representative audit data.
