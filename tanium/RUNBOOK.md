@@ -1,0 +1,184 @@
+# Tanium FIM Sizing Runbook
+
+Step-by-step guide to deploy auditd FIM rules to test machines via Tanium, collect sizing data, and produce volume estimates.
+
+---
+
+## Prerequisites
+
+- Tanium console access with Package, Sensor, and Action permissions
+- Target endpoints in a **Computer Group** (e.g. `FIM-Sizing-Test`)
+- Target endpoints running Linux with Tanium Client installed
+
+---
+
+## Step 1: Create the Tanium Package
+
+1. **Tanium Console** → Administration → Packages → Create Package
+2. Package settings:
+   - **Name:** `auditd-fim-deploy`
+   - **Display Name:** `Auditd FIM Deploy (Sizing)`
+   - **Command:** `bash deploy-fim.sh $1`
+   - **Parameter 1:** `role` (string) — e.g. `webserver`, `database`, `bastion`, `cirunner`, `containerhost`
+   - **Process group:** `fim-deploy`
+   - **Expire after:** 1 hour
+3. Upload these files to the package:
+   - `deploy-fim.sh`
+   - `prod.rules` (from repo root `../prod.rules`)
+   - `sizing-sensor.sh`
+4. Save the package.
+
+---
+
+## Step 2: Create Computer Groups by Role
+
+For each node role, create a Computer Group or use an existing one:
+
+| Computer Group       | Example filter                                    |
+|----------------------|---------------------------------------------------|
+| FIM-Test-Webservers  | `Computer Name contains web-test`                 |
+| FIM-Test-Databases   | `Computer Name contains db-test`                  |
+| FIM-Test-Bastions    | `Computer Name contains bastion-test`             |
+
+If using a single test machine, create one group (e.g. `FIM-Sizing-Test`).
+
+---
+
+## Step 3: Deploy Rules via Action
+
+Run one Action per role so nodes get tagged correctly:
+
+1. **Tanium Console** → Actions → Deploy Action
+2. **Package:** `auditd-fim-deploy`
+3. **Parameter `role`:** set to the node's role (e.g. `webserver`)
+4. **Target:** the appropriate Computer Group
+5. **Schedule:** Run once (immediate)
+6. Verify:
+   - Action status shows "Completed" on all targets
+   - Ask the question: `Get Tanium Action Log from all machines with...`
+   - Look for `[auditd-fim] Deployment complete` in results
+
+**Repeat for each role** with the correct role parameter.
+
+---
+
+## Step 4: Wait for Bake Period
+
+Allow **24-48 hours** for the endpoints to generate representative audit data.
+
+- Do NOT run during a maintenance/patching window (unless you want to measure patch noise)
+- Ideally cover a normal business day cycle
+
+---
+
+## Step 5: Create the Sizing Sensor
+
+1. **Tanium Console** → Administration → Sensors → Create Sensor
+2. Sensor settings:
+   - **Name:** `Auditd FIM Sizing`
+   - **Platform:** Linux
+   - **Script type:** Shell
+   - **Script:**
+     ```bash
+     #!/bin/bash
+     if [[ -x /opt/tanium/sizing-sensor.sh ]]; then
+         bash /opt/tanium/sizing-sensor.sh 24
+     else
+         echo "SENSOR_NOT_DEPLOYED"
+     fi
+     ```
+   - **Delimiter:** `|`
+   - **Columns:** `hostname`, `role`, `key`, `events`, `bytes_per_day`, `sample_hours`
+   - **Max age:** 1 hour
+3. Save the sensor.
+
+---
+
+## Step 6: Collect Sizing Data
+
+### Option A: Via Sensor (interactive)
+
+1. **Tanium Console** → Ask a Question:
+   ```
+   Get Auditd FIM Sizing from all machines in the FIM-Sizing-Test group
+   ```
+2. Results appear as a table with columns: hostname, role, key, events, bytes_per_day
+3. **Export** results as CSV from the Tanium console
+
+### Option B: Via Action (batch)
+
+1. Create a one-time package `auditd-fim-collect`:
+   - **Command:** `bash collect-sizing.sh 24`
+   - Upload `collect-sizing.sh`
+2. Deploy to the Computer Group
+3. Retrieve results file:
+   - Ask: `Get File Contents{filePath=/opt/tanium/sizing-results.csv} from all machines in FIM-Sizing-Test`
+   - Export as CSV
+
+---
+
+## Step 7: Aggregate Results
+
+On your local workstation (or the admin box):
+
+```bash
+# If you exported a single merged CSV from Tanium:
+bash aggregate-fleet.sh /path/to/tanium-export.csv
+
+# If you have one CSV per host in a directory:
+bash aggregate-fleet.sh /path/to/csv-dir/
+```
+
+The aggregator outputs per-role stats (min / median / max bytes/day) and fleet-wide projections.
+
+---
+
+## Step 8: Review and Decide
+
+Use the aggregator output to answer:
+
+| Question | Where to look |
+|---|---|
+| Which role generates the most logs? | Per-role TOTAL (MB/day) |
+| Which keys are noisiest? | Per-key MAX column |
+| What's total SIEM ingest? | Fleet-wide combined MB/day |
+| Do I need role-specific rule variants? | Compare roles — if one is 10x others, consider trimming |
+
+### If a key is too noisy for a role:
+
+1. Add a `never,exit` exclusion for the noisy executable
+2. Scope the rule to fewer directories
+3. Create a role-specific variant of `prod.rules`
+4. Redeploy and re-measure
+
+---
+
+## Step 9: Go Live
+
+Once sizing is approved:
+
+1. Create package `auditd-fim-lock`:
+   - Upload `lock-rules.sh`
+   - **Command:** `bash lock-rules.sh`
+2. Deploy to all target machines
+3. Schedule a reboot (the `-e 2` lock requires reboot to activate)
+4. Verify post-reboot:
+   ```
+   Get Auditd FIM Sizing from all machines in <production group>
+   ```
+
+---
+
+## Cleanup (optional)
+
+To remove FIM rules from test machines:
+
+```bash
+rm -f /etc/audit/rules.d/90-fim.rules
+rm -f /etc/auditd-fim-role
+rm -f /opt/tanium/sizing-sensor.sh
+rm -f /opt/tanium/sizing-results.csv
+augenrules --load
+```
+
+Package this as `auditd-fim-remove` for Tanium if needed.
