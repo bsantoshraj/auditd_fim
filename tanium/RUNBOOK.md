@@ -101,14 +101,63 @@ Run the test suite on deployed endpoints to confirm all rules are firing correct
    > so `auid` remains unset (4294967295). These tests skip automatically in that context.
    > To fully validate these rules, run the test suite interactively via SSH: `sudo bash testsuite/run_all.sh`
 
+5. **OS variance issues caught by the test suite:**
+
+   The test suite doubles as a smoke test for cross-platform compatibility. When deploying
+   across a mixed fleet, run tests on **at least one node per OS/distro** to catch issues like:
+
+   | OS variance | Symptom | Fix applied |
+   |---|---|---|
+   | `/bin` → `/usr/bin` symlink (Ubuntu 20.04+, Fedora 33+) | Watch on `/bin` fires under `fim.usrbin` key instead of `fim.bin` | Removed redundant `/bin`, `/sbin` watches |
+   | `sudo` group missing (RHEL/CentOS) | `usermod -aG sudo` fails | Test auto-detects `wheel` vs `sudo` |
+   | `auditd` not installed | deploy-fim.sh fails | Script auto-installs via apt/yum/dnf |
+   | SELinux context differences | Rules may behave differently | Check `subj_type` in noise exclusions |
+   | Older kernels (< 3.x) | Some syscall filters unsupported | Verify `auditctl -l` shows all rules loaded |
+   | Missing `/etc/audit/rules.d/` | Rule deployment fails | deploy-fim.sh creates the directory |
+
+   If a test fails on a specific OS but passes on others, investigate before proceeding
+   to the bake period. Fix the rule or test, rebuild `testsuite.tar.gz`, and re-run.
+
 ---
 
 ## Step 4: Wait for Bake Period
 
-Allow **24-48 hours** for the endpoints to generate representative audit data.
+Once the test suite confirms all rules are firing (Exit Code 0, `ALL TESTS PASSED`),
+leave the rules active and let the endpoints generate real-world audit data.
 
-- Do NOT run during a maintenance/patching window (unless you want to measure patch noise)
-- Ideally cover a normal business day cycle
+**Required bake time: 24-48 hours**
+
+- The goal is to capture a representative sample of normal operations so the sizing
+  data reflects actual production workloads, not just test events
+- Do NOT proceed to Step 5 until the bake period has elapsed
+
+**Guidelines:**
+
+- Do NOT start the bake during a maintenance/patching window (unless you specifically
+  want to measure patch noise — this is useful but should be a separate measurement)
+- Ideally cover a full business day cycle (user logins, cron jobs, deployments, backups)
+- If the environment has weekly batch jobs or scheduled tasks, consider extending to 72h
+  to capture those patterns
+- Monitor `auditctl -s` on a sample node during the bake to ensure no events are being
+  dropped (`lost` counter should stay at 0; if it climbs, increase `-b` buffer size)
+
+**What to watch for during the bake:**
+
+| Indicator | How to check | Action if abnormal |
+|---|---|---|
+| Event drops | `auditctl -s` → `lost` field | Increase `-b` buffer in prod.rules |
+| Disk usage | `du -sh /var/log/audit/` | If growing fast, identify noisy key early |
+| Backlog | `auditctl -s` → `backlog` field | Should stay well below `backlog_limit` (8192) |
+| auditd health | `systemctl status auditd` | Should be active (running) throughout |
+
+**Quick health check via Tanium** (optional, run during bake):
+
+Ask the question:
+```
+Get Online from all machines in <FIM Computer Group>
+```
+Then verify all endpoints are still reporting in. If any went offline, check whether
+auditd caused a stability issue (unlikely but worth confirming).
 
 ---
 
