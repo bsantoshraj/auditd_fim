@@ -1,0 +1,57 @@
+[+] Writing output to: /home/ubuntu/auditd_fim/docs/sizing-output.txt
+
+=============================================
+ Auditd FIM Sizing Report
+=============================================
+Host:          admin
+Sample window: 24h
+From:          2026-03-22 10:26:02
+To:            2026-03-23 10:26:02
+=============================================
+
+KEY                      EVENTS        BYTES    BYTES/DAY
+---                      ------        -----    ---------
+fim.identity                136        54400        54400
+fim.sudo                     10         4000         4000
+fim.ssh                       5         2000         2000
+fim.usrbin                   13         5200         5200
+fim.usrsbin                  13         5200         5200
+fim.cron                     30        12000        12000
+fim.systemd                  10         4000         4000
+fim.boot                      5         2000         2000
+fim.kernel                    5         2000         2000
+fim.delete                  250       150000       150000
+fim.perm                    151        90600        90600
+fim.owner                   176       105600       105600
+exec.tmp                      5         4500         4500
+exec.shm                      1          900          900
+exec.vartmp                   1          900          900
+exec.priv_esc               949       854100       854100
+
+TOTAL                      1760                   1297400
+
+=============================================
+ Estimated Daily Volume
+=============================================
+  1.24 MB/day  (0.0012 GB/day)
+  0.04 GB/month (30-day)
+
+=============================================
+ Noise Flags (>1000 events/day)
+=============================================
+  None — all keys under 1000 events/day
+
+=============================================
+ Top 10 Executables Generating Events
+=============================================
+       345  /usr/bin/sudo
+       228  /usr/sbin/userdel
+       185  /usr/sbin/auditctl
+       176  /usr/sbin/useradd
+       162  /usr/sbin/ausearch
+       146  /usr/bin/wc
+       124  /usr/sbin/usermod
+       120  /usr/bin/grep
+       100  /usr/sbin/groupdel
+       100  /usr/sbin/groupadd
+
