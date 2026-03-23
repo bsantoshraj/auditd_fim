@@ -27,6 +27,31 @@ PACKAGE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 log() { echo "[auditd-fim] $1"; }
 
+# --- 0. Detect Tanium client directory ---
+
+TANIUM_DIR=""
+for d in /opt/Tanium/TaniumClient /opt/tanium /opt/Tanium /var/opt/Tanium /usr/local/tanium /usr/local/Tanium; do
+    if [[ -d "$d" ]]; then
+        TANIUM_DIR="$d"
+        break
+    fi
+done
+
+if [[ -z "$TANIUM_DIR" ]]; then
+    # Try finding TaniumClient process working dir
+    TANIUM_PID=$(pgrep -f TaniumClient 2>/dev/null | head -1)
+    if [[ -n "$TANIUM_PID" ]]; then
+        TANIUM_DIR=$(readlink -f "/proc/$TANIUM_PID/cwd" 2>/dev/null || true)
+    fi
+fi
+
+if [[ -z "$TANIUM_DIR" || ! -d "$TANIUM_DIR" ]]; then
+    log "ERROR: Cannot locate Tanium client directory"
+    exit 1
+fi
+
+log "Tanium directory: $TANIUM_DIR"
+
 # --- 1. Ensure auditd is installed ---
 
 if ! command -v auditctl &>/dev/null; then
@@ -71,9 +96,9 @@ fi
 
 # --- 5. Deploy sensor script ---
 
-cp "$PACKAGE_DIR/sizing-sensor.sh" /opt/tanium/sizing-sensor.sh
-chmod 755 /opt/tanium/sizing-sensor.sh
-log "Sensor deployed to /opt/tanium/sizing-sensor.sh"
+cp "$PACKAGE_DIR/sizing-sensor.sh" "$TANIUM_DIR/sizing-sensor.sh"
+chmod 755 "$TANIUM_DIR/sizing-sensor.sh"
+log "Sensor deployed to $TANIUM_DIR/sizing-sensor.sh"
 
 # --- 6. Verify ---
 

@@ -81,8 +81,16 @@ Allow **24-48 hours** for the endpoints to generate representative audit data.
    - **Script:**
      ```bash
      #!/bin/bash
-     if [[ -x /opt/tanium/sizing-sensor.sh ]]; then
-         bash /opt/tanium/sizing-sensor.sh 24
+     SENSOR=""
+     for d in /opt/Tanium/TaniumClient /opt/tanium /opt/Tanium \
+              /var/opt/Tanium /usr/local/tanium /usr/local/Tanium; do
+         if [[ -x "$d/sizing-sensor.sh" ]]; then
+             SENSOR="$d/sizing-sensor.sh"
+             break
+         fi
+     done
+     if [[ -n "$SENSOR" ]]; then
+         bash "$SENSOR" 24
      else
          echo "SENSOR_NOT_DEPLOYED"
      fi
@@ -112,7 +120,8 @@ Allow **24-48 hours** for the endpoints to generate representative audit data.
    - Upload `collect-sizing.sh`
 2. Deploy to the Computer Group
 3. Retrieve results file:
-   - Ask: `Get File Contents{filePath=/opt/tanium/sizing-results.csv} from all machines in FIM-Sizing-Test`
+   - Ask: `Get File Contents{filePath=<tanium_dir>/sizing-results.csv} from all machines in FIM-Sizing-Test`
+     (where `<tanium_dir>` is the Tanium client path on your endpoints, e.g. `/opt/Tanium/TaniumClient`)
    - Export as CSV
 
 ---
