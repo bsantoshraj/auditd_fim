@@ -1,0 +1,57 @@
+sudo cp /home/ubuntu/auditd_fim/prod.rules /etc/audit/rules.d/prod.rules && 
+  sudo augenrules --load && sudo bash                                            
+  /home/ubuntu/auditd_fim/testsuite/run_all.sh 
+[+] Running audit detection test suite (user: ubuntu)
+--------------------------------------
+[+] Running 01_fim_tmp.sh
+--------------------------------------
+[+] FIM /tmp delete (user-origin)
+[PASS] FIM /tmp delete (user-origin) (fim.delete detected)
+--------------------------------------
+[+] Running 02_suid.sh
+--------------------------------------
+[+] SUID creation in /tmp
+[PASS] SUID creation in /tmp (fim.perm detected)
+--------------------------------------
+[+] Running 03_exec_tmp.sh
+--------------------------------------
+[+] Execution from /tmp
+uid=0(root) gid=0(root) groups=0(root)
+[PASS] Execution from /tmp (exec.tmp detected)
+--------------------------------------
+[+] Running 04_priv_esc.sh
+--------------------------------------
+[+] Privilege escalation (sudo)
+uid=0(root) gid=0(root) groups=0(root)
+[PASS] Privilege escalation (sudo) (exec.priv_esc detected)
+--------------------------------------
+[+] Running 05_identity.sh
+--------------------------------------
+[+] Group add
+[PASS] Group add (fim.identity detected)
+[+] User add
+[PASS] User add (fim.identity detected)
+[+] User mod
+[PASS] User mod (fim.identity detected)
+[+] Password change
+[PASS] Password change (fim.identity detected)
+[+] User delete
+[PASS] User delete (fim.identity detected)
+[+] Group delete
+[PASS] Group delete (fim.identity detected)
+--------------------------------------
+[+] Running 06_bin_tamper.sh
+--------------------------------------
+[+] Binary tamper /usr/bin
+[PASS] Binary tamper /usr/bin (fim.usrbin detected)
+--------------------------------------
+[+] Running 07_sbin_tamper.sh
+--------------------------------------
+[+] Sbin tamper /usr/sbin
+[PASS] Sbin tamper /usr/sbin (fim.usrsbin detected)
+======================================
+RESULT SUMMARY
+======================================
+Passed: 7
+Failed: 0
+
