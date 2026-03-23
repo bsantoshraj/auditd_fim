@@ -1,6 +1,3 @@
-sudo cp /home/ubuntu/auditd_fim/prod.rules /etc/audit/rules.d/prod.rules && 
-  sudo augenrules --load && sudo bash                                            
-  /home/ubuntu/auditd_fim/testsuite/run_all.sh 
 [+] Running audit detection test suite (user: ubuntu)
 --------------------------------------
 [+] Running 01_fim_tmp.sh
