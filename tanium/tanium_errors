@@ -1,0 +1,19 @@
+042|backlog_limit 8192
+043|lost 0
+044|backlog 0
+045|backlog_wait_time 0
+046|backlog_wait_time_actual 0
+047|enabled 1
+048|failure 1
+049|pid 917
+050|rate_limit 0
+051|backlog_limit 8192
+052|lost 0
+053|backlog 81
+054|backlog_wait_time 60000
+055|backlog_wait_time_actual 0
+056|[auditd-fim] Rules loaded successfully
+057|cp: cannot create regular file '/opt/tanium/sizing-sensor.sh': No such file or directory
+058|2026-03-23T05:46:10Z|Completed.
+059|2026-03-23T05:46:10Z|Action Timing: 50ms
+060|2026-03-23T05:46:10Z|Action Exit Code: 1
