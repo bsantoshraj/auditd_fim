@@ -1,0 +1,72 @@
+001|2026-03-23T06:48:10Z|Action ID: 3300791
+002|2026-03-23T06:48:10Z|Package Name: auditd-fim-tests
+003|2026-03-23T06:48:10Z|Downloading.
+004|2026-03-23T06:48:11Z|Running.
+005|2026-03-23T06:48:11Z|Process Group: true
+006|2026-03-23T06:48:11Z|Command Line: /bin/bash run-tests.sh
+007|[auditd-fim-test] Extracted testsuite.tar.gz
+008|[auditd-fim-test] Audit rules active: 36
+009|[auditd-fim-test] Running tests as context user: chronicle
+010|[auditd-fim-test] Host: atl4chronlog05.admin.myregisteredsite.com
+011|[auditd-fim-test] Date: 2026-03-23T06:48:11Z
+012|
+013|--------------------------------------
+014|[+] Running 01_fim_tmp.sh
+015|--------------------------------------
+016|[+] FIM /tmp delete (user-origin)
+017|[PASS] FIM /tmp delete (user-origin) (fim.delete detected)
+018|--------------------------------------
+019|[+] Running 02_suid.sh
+020|--------------------------------------
+021|[+] SUID creation in /tmp
+022|[FAIL] SUID creation in /tmp (no new audit event)
+023|--------------------------------------
+024|[+] Running 03_exec_tmp.sh
+025|--------------------------------------
+026|[+] Execution from /tmp
+027|uid=0(root) gid=0(root) groups=0(root) context=system_u:system_r:unconfined_service_t:s0
+028|[PASS] Execution from /tmp (exec.tmp detected)
+029|--------------------------------------
+030|[+] Running 04_priv_esc.sh
+031|--------------------------------------
+032|[+] Privilege escalation (sudo)
+033|uid=0(root) gid=0(root) groups=0(root) context=system_u:system_r:unconfined_service_t:s0
+034|[FAIL] Privilege escalation (sudo) (no new audit event)
+035|--------------------------------------
+036|[+] Running 05_identity.sh
+037|--------------------------------------
+038|[+] Group add
+039|[PASS] Group add (fim.identity detected)
+040|[+] User add
+041|[PASS] User add (fim.identity detected)
+042|[+] User mod
+043|usermod: group 'sudo' does not exist
+044|[FAIL] User mod (command failed)
+045|[+] Password change
+046|[PASS] Password change (fim.identity detected)
+047|[+] User delete
+048|[PASS] User delete (fim.identity detected)
+049|[+] Group delete
+050|[PASS] Group delete (fim.identity detected)
+051|--------------------------------------
+052|[+] Running 06_bin_tamper.sh
+053|--------------------------------------
+054|[+] Binary tamper /usr/bin
+055|[PASS] Binary tamper /usr/bin (fim.usrbin detected)
+056|--------------------------------------
+057|[+] Running 07_sbin_tamper.sh
+058|--------------------------------------
+059|[+] Sbin tamper /usr/sbin
+060|[PASS] Sbin tamper /usr/sbin (fim.usrsbin detected)
+061|
+062|======================================
+063|RESULT SUMMARY
+064|======================================
+065|Host:   atl4chronlog05.admin.myregisteredsite.com
+066|Passed: 5
+067|Failed: 2
+068|======================================
+069|[auditd-fim-test] FAILED — 2 test(s) did not pass
+070|2026-03-23T06:48:36Z|Completed.
+071|2026-03-23T06:48:36Z|Action Timing: 25476ms
+072|2026-03-23T06:48:36Z|Action Exit Code: 1
