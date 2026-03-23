@@ -72,7 +72,7 @@ Run the test suite on deployed endpoints to confirm all rules are firing correct
    - **Expire after:** 10 minutes
    - Upload these files:
      - `run-tests.sh`
-     - `testsuite/` (entire directory including `lib/` and `tests/`)
+     - `testsuite.tar.gz` (bundled test suite — rebuild with `tar czf tanium/testsuite.tar.gz testsuite/`)
 
 2. **Deploy Action:**
    - **Package:** `auditd-fim-tests`

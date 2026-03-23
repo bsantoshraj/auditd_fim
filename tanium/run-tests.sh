@@ -6,8 +6,8 @@
 # endpoint and reports results.
 #
 # Files expected in Tanium package:
-#   - run-tests.sh       (this script)
-#   - testsuite/          (full test suite dir)
+#   - run-tests.sh        (this script)
+#   - testsuite.tar.gz    (bundled test suite)
 #############################################
 
 set -uo pipefail
@@ -22,9 +22,15 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+# Extract test suite from archive
 if [[ ! -d "$SUITE_DIR" ]]; then
-    log "ERROR: testsuite directory not found in package"
-    exit 1
+    if [[ -f "$PACKAGE_DIR/testsuite.tar.gz" ]]; then
+        tar xzf "$PACKAGE_DIR/testsuite.tar.gz" -C "$PACKAGE_DIR"
+        log "Extracted testsuite.tar.gz"
+    else
+        log "ERROR: testsuite.tar.gz not found in package"
+        exit 1
+    fi
 fi
 
 # Ensure scripts are executable
