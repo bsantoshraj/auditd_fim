@@ -27,6 +27,7 @@ fi
 # Byte estimates per event type
 declare -A BPE=(
     [fim.identity]=400  [fim.sudo]=400     [fim.ssh]=400
+    [fim.auditlog]=400
     [fim.usrbin]=400    [fim.usrsbin]=400
     [fim.cron]=400      [fim.systemd]=400  [fim.boot]=400
     [fim.kernel]=400
@@ -36,7 +37,7 @@ declare -A BPE=(
 )
 
 KEYS=(
-    fim.identity fim.sudo fim.ssh
+    fim.identity fim.sudo fim.ssh fim.auditlog
     fim.usrbin fim.usrsbin
     fim.cron fim.systemd fim.boot fim.kernel
     fim.delete fim.perm fim.owner
