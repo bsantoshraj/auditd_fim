@@ -86,15 +86,20 @@ Run the test suite on deployed endpoints to confirm all rules are firing correct
 
 4. **Troubleshooting failures:**
 
-   | Failed test | Likely cause |
-   |---|---|
-   | `01_fim_tmp` (fim.delete) | Rules not loaded or `never,exit` excluding the test user |
-   | `02_suid` (fim.perm) | chmod syscall rule missing or auid filter too restrictive |
-   | `03_exec_tmp` (exec.tmp) | execve rule not loaded for /tmp |
-   | `04_priv_esc` (exec.priv_esc) | No real user context (SUDO_USER not set) |
-   | `05_identity` (fim.identity) | /etc/passwd watch not loaded |
-   | `06_bin_tamper` (fim.usrbin) | /usr/bin watch not loaded |
-   | `07_sbin_tamper` (fim.usrsbin) | /usr/sbin watch not loaded |
+   | Test | Expected in Tanium | Likely cause if unexpected |
+   |---|---|---|
+   | `01_fim_tmp` (fim.delete) | PASS | Rules not loaded or `never,exit` excluding the test user |
+   | `02_suid` (fim.perm) | **SKIP** (no login session) | Will show `[SKIP]` — auid is unset in Tanium service context, rule requires auid>=1000. This is expected. |
+   | `03_exec_tmp` (exec.tmp) | PASS | execve rule not loaded for /tmp |
+   | `04_priv_esc` (exec.priv_esc) | **SKIP** (no login session) | Will show `[SKIP]` — same auid issue as 02. Validates only from interactive SSH sessions. |
+   | `05_identity` (fim.identity) | PASS | /etc/passwd watch not loaded. Uses `wheel` on RHEL, `sudo` on Debian. |
+   | `06_bin_tamper` (fim.usrbin) | PASS | /usr/bin watch not loaded |
+   | `07_sbin_tamper` (fim.usrsbin) | PASS | /usr/sbin watch not loaded |
+
+   > **Note:** Tests 02 and 04 rely on `auid` (audit login UID) which is only set during
+   > interactive SSH/console login. Tanium actions run as a root service with no PAM session,
+   > so `auid` remains unset (4294967295). These tests skip automatically in that context.
+   > To fully validate these rules, run the test suite interactively via SSH: `sudo bash testsuite/run_all.sh`
 
 ---
 
