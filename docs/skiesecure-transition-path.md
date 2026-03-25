@@ -945,6 +945,56 @@ fim-ml-service:
 
 ---
 
+## Part 6: AI SOC Agent (The Core Differentiator)
+
+See `docs/ai-soc-agent-architecture.md` for full design. Summary of transitions:
+
+### Transition 6.1: Create agent-service (NestJS + Claude API)
+
+```bash
+make new-service NAME=agent-service
+```
+
+**Dependencies:** `@anthropic-ai/sdk` (npm), alert-case-service, enrichment-service
+
+**New Redpanda topics:**
+```bash
+rpk topic create agent.tasks --partitions 6 --replicas 1
+rpk topic create agent.actions --partitions 12 --replicas 1
+rpk topic create agent.verdicts --partitions 6 --replicas 1
+rpk topic create agent.corrections --partitions 3 --replicas 1
+```
+
+**New PostgreSQL database:** `agent_training_db`
+
+**Kong route:** `/api/agents` → agent-service:3000
+
+**Skaffold:** Add to services/skaffold.yaml, localPort 3060
+
+### Transition 6.2: Deploy MISP (Threat Intel Platform)
+
+```
+platform/misp/
+├── Chart.yaml
+├── values.yaml
+└── templates/
+```
+
+Uses existing PostgreSQL and Redis. Subscribes to abuse.ch, CIRCL, Botvrij feeds.
+
+### Transition 6.3: Instrument alert-case-service for Workflow Recording
+
+Add middleware to alert-case-service that records every analyst action
+(query, enrich, verdict, escalate, note) to `agent_training_db.analyst_actions`.
+
+### Transition 6.4: Frontend — Agent Dashboard + Review Queue
+
+- analyst-portal: `/agents` (dashboard), `/agents/review` (human review queue),
+  `/agents/training` (few-shot management), `/agents/audit` (audit trail)
+- customer-portal: AI badge on alert detail, investigation transcript, escalation button
+
+---
+
 ## Execution Order
 
 Execute these transitions in this order to minimise risk:
@@ -957,15 +1007,19 @@ Execute these transitions in this order to minimise risk:
 | **4** | 2.4 — Extend ingestion-service for FIM | fim-service topics exist | 3 days |
 | **5** | 2.5 — FIM Sigma rules in detection-engine | ingestion-service FIM support | 3 days |
 | **6** | 2.7 — Keycloak fim_admin role | None | 1 hour |
-| **7** | 3.1 — MLflow deployment | MinIO exists | 1 day |
-| **8** | 2.2 — fim-ml-service (Python) | MLflow, ClickHouse FIM table | 2 weeks |
-| **9** | 2.3 — fim-agent (Go binary) | fim-service API ready | 2 weeks |
-| **10** | 2.6 — Frontend extensions | fim-service + fim-ml-service APIs | 2 weeks |
-| **11** | 3.2 — Label Studio | fim-ml-service ready | 1 day |
-| **12** | 1.1 — Kill Bill / Lago (billing) | When needed (>20 customers) | 1 week |
-| **13** | 1.3 — Typst (PDF reports) | reporting-service scaffold | 3 days |
-| **14** | 1.4 — Threat intel feeds | enrichment-service scaffold | 1 week |
-| **15** | 1.5 — OpenSearch (if needed) | ClickHouse limits hit | 1 week |
+| **7** | 1.4 — Threat intel feeds + MISP | enrichment-service scaffold | 1 week |
+| **8** | **6.1 — agent-service** (AI SOC agents) | enrichment, alert-case-service | **2 weeks** |
+| **9** | **6.3 — Workflow recording** | agent-service + alert-case-service | **3 days** |
+| **10** | **6.4 — Agent dashboard + review queue** | agent-service API | **1 week** |
+| **11** | 2.2 — fim-ml-service (Python) | ClickHouse FIM table | 2 weeks |
+| **12** | 2.3 — fim-agent (Go binary) | fim-service API ready | 2 weeks |
+| **13** | 2.6 — Frontend extensions (FIM views) | fim-service + fim-ml-service APIs | 2 weeks |
+| **14** | 1.1 — Kill Bill / Lago (billing) | When needed (>20 customers) | 1 week |
+| **15** | 1.3 — Typst (PDF reports) | reporting-service scaffold | 3 days |
+
+**Note:** agent-service (Step 8) moved up in priority. It's the core differentiator —
+the AI SOC agent is what makes the MSSP pricing viable. FIM ML (Step 11) is now
+secondary — the AI agent handles FIM alerts just like any other alert type.
 
 ---
 
@@ -1004,8 +1058,16 @@ Execute these transitions in this order to minimise risk:
 | **Syft** | SBOM generation | Apache-2.0 | **NEW (FIM, customer-side)** |
 | **Vector** | Log shipping agent | MPL-2.0 | Existing (collector) |
 | **Nodemailer** | Email delivery | MIT | **NEW (notification-service)** |
+| **Claude API** | AI SOC agent LLM | Usage-based ($3/M input, $15/M output tokens) | **NEW (agent-service)** |
+| **@anthropic-ai/sdk** | Claude API client | MIT | **NEW (agent-service)** |
+| **MISP** | Threat intelligence platform | AGPL-3.0 | **NEW (enrichment)** |
+| **Typst** | PDF report generation | Apache-2.0 | **NEW (reporting-service)** |
 
-**Proprietary/paid dependencies after transition: ZERO.**
+**Proprietary/paid dependencies after transition: ONE (Claude API).**
+
+The Claude API is the only paid external dependency. At ~$0.01-0.05 per L1 alert
+triage and ~$0.10-0.50 per L2 investigation, the cost is ~$3K/month for 2000
+alerts/day — far less than a single human analyst ($80K/year = $6.7K/month).
 
 The only external cost is the payment gateway (Stripe/Adyen/PayPal) for processing card
 payments — which is unavoidable for any billing system. Kill Bill/Lago abstracts the
