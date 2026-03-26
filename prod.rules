@@ -54,7 +54,16 @@
 
 
 #############################################
-# 3. System binary integrity
+# 3. Audit log integrity (PCI-DSS 10.3.4)
+#############################################
+
+-w /var/log/audit/              -p wa -k fim.auditlog
+-w /etc/audit/                  -p wa -k fim.auditlog
+-w /etc/audit/rules.d/          -p wa -k fim.auditlog
+
+
+#############################################
+# 4. System binary integrity
 #############################################
 
 -w /usr/bin    -p wa -k fim.usrbin
@@ -62,7 +71,7 @@
 
 
 #############################################
-# 4. Persistence mechanisms
+# 5. Persistence mechanisms
 #############################################
 
 -w /etc/cron.d        -p wa -k fim.cron
@@ -77,7 +86,7 @@
 
 
 #############################################
-# 5. Boot & kernel integrity
+# 6. Boot & kernel integrity
 #############################################
 
 -w /boot        -p wa -k fim.boot
@@ -85,7 +94,7 @@
 
 
 #############################################
-# 6. File deletion / replacement
+# 7. File deletion / replacement
 #############################################
 
 -a always,exit -F arch=b64 -S rename,renameat,unlink,unlinkat -F auid>=1000 -F auid!=4294967295 -k fim.delete
@@ -93,7 +102,7 @@
 
 
 #############################################
-# 7. Permission & ownership tampering
+# 8. Permission & ownership tampering
 #############################################
 
 -a always,exit -F arch=b64 -S chmod,fchmod,fchmodat -F auid>=1000 -F auid!=4294967295 -k fim.perm
