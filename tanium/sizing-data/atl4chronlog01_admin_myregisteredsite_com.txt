@@ -1,0 +1,19 @@
+# HOST: atl4chronlog01.admin.myregisteredsite.com
+# ROLE: chronlog
+
+fim.identity                 24       9600       9600
+fim.sudo                     12       4800       4800
+fim.ssh                       6       2400       2400
+fim.usrbin                    6       2400       2400
+fim.usrsbin                   6       2400       2400
+fim.cron                     36      14400      14400
+fim.systemd                  12       4800       4800
+fim.boot                      6       2400       2400
+fim.kernel                    6       2400       2400
+fim.delete                  537     322200     322200
+fim.perm                     12       7200       7200
+fim.owner                    12       7200       7200
+exec.tmp                      6       5400       5400
+exec.shm                      6       5400       5400
+exec.vartmp                   6       5400       5400
+exec.priv_esc                 6       5400       5400

@@ -1,0 +1,19 @@
+# HOST: pro1chronlog05.admin.myregisteredsite.com
+# ROLE: chronlog
+
+fim.identity                 16       6400       6400
+fim.sudo                      8       3200       3200
+fim.ssh                       4       1600       1600
+fim.usrbin                    4       1600       1600
+fim.usrsbin                   4       1600       1600
+fim.cron                     24       9600       9600
+fim.systemd                   8       3200       3200
+fim.boot                      4       1600       1600
+fim.kernel                    4       1600       1600
+fim.delete                  540     324000     324000
+fim.perm                      8       4800       4800
+fim.owner                     8       4800       4800
+exec.tmp                      4       3600       3600
+exec.shm                      4       3600       3600
+exec.vartmp                   4       3600       3600
+exec.priv_esc                 4       3600       3600

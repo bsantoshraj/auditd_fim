@@ -1,0 +1,125 @@
+=============================================
+ Fleet Sizing Summary
+=============================================
+Data source: tanium/sizing-data
+Generated:   2026-03-26 19:17:02
+=============================================
+
+---------------------------------------------
+ Role: chronlog  (18 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc              3600       5400       7200
+exec.shm                   3600       5400       7200
+exec.tmp                   3600       5400       7200
+exec.vartmp                3600       5400       7200
+fim.boot                   1600       2400       3200
+fim.cron                   9600      14400      19200
+fim.delete               316200     326400     326400
+fim.identity               6400       9600      12800
+fim.kernel                 1600       2400       3200
+fim.owner                  4800       7200       9600
+fim.perm                   4800       7200       9600
+fim.ssh                    1600       2400       3200
+fim.sudo                   3200       4800       6400
+fim.systemd                3200       4800       6400
+fim.usrbin                 1600       2400       3200
+fim.usrsbin                1600       2400       3200
+
+TOTAL (bytes)            370600     408000     435200
+TOTAL (MB/day)             0.35       0.39       0.42
+TOTAL (GB/month)           0.01       0.01       0.01
+
+---------------------------------------------
+ Role: logforwarder  (1 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc              5400       5400       5400
+exec.shm                   5400       5400       5400
+exec.tmp                   5400       5400       5400
+exec.vartmp                5400       5400       5400
+fim.boot                   2400       2400       2400
+fim.cron                  14400      14400      14400
+fim.delete               326400     326400     326400
+fim.identity               9600       9600       9600
+fim.kernel                 2400       2400       2400
+fim.owner                  7200       7200       7200
+fim.perm                   7200       7200       7200
+fim.ssh                    2400       2400       2400
+fim.sudo                   4800       4800       4800
+fim.systemd                4800       4800       4800
+fim.usrbin                 2400       2400       2400
+fim.usrsbin                2400       2400       2400
+
+TOTAL (bytes)            408000     408000     408000
+TOTAL (MB/day)             0.39       0.39       0.39
+TOTAL (GB/month)           0.01       0.01       0.01
+
+---------------------------------------------
+ Role: nes  (2 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc              5400       5400       5400
+exec.shm                   5400       5400       5400
+exec.tmp                   5400       5400       5400
+exec.vartmp                5400       5400       5400
+fim.boot                   2400       2400       2400
+fim.cron                  14400      14400      14400
+fim.delete               322200     324300     326400
+fim.identity               9600       9600       9600
+fim.kernel                 2400       2400       2400
+fim.owner                  7200       7200       7200
+fim.perm                   7200       7200       7200
+fim.ssh                    2400       2400       2400
+fim.sudo                   4800       4800       4800
+fim.systemd                4800       4800       4800
+fim.usrbin                 2400       2400       2400
+fim.usrsbin                2400       2400       2400
+
+TOTAL (bytes)            403800     405900     408000
+TOTAL (MB/day)             0.39       0.39       0.39
+TOTAL (GB/month)           0.01       0.01       0.01
+
+---------------------------------------------
+ Role: secpxy  (2 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc              3600       4500       5400
+exec.shm                   3600       4500       5400
+exec.tmp                   3600       4500       5400
+exec.vartmp                3600       4500       5400
+fim.boot                   1600       2000       2400
+fim.cron                   9600      12000      14400
+fim.delete               319800     321000     322200
+fim.identity               6400       8000       9600
+fim.kernel                 1600       2000       2400
+fim.owner                  4800       6000       7200
+fim.perm                   4800       6000       7200
+fim.ssh                    1600       2000       2400
+fim.sudo                   3200       4000       4800
+fim.systemd                3200       4000       4800
+fim.usrbin                 1600       2000       2400
+fim.usrsbin                1600       2000       2400
+
+TOTAL (bytes)            374200     389000     403800
+TOTAL (MB/day)             0.36       0.37       0.39
+TOTAL (GB/month)           0.01       0.01       0.01
+
+=============================================
+ Fleet-wide Projection
+=============================================
+
+Total hosts:     23
+Combined daily:  8.92 MB/day
+Combined monthly: 0.26 GB/month (30-day)
+
+Average per host: 0.39 MB/day
+
