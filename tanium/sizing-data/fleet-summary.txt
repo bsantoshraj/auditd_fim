@@ -2,7 +2,116 @@
  Fleet Sizing Summary
 =============================================
 Data source: tanium/sizing-data
-Generated:   2026-03-26 19:17:02
+Generated:   2026-03-26 19:28:37
+=============================================
+
+=============================================
+ SECTION 1: EVENT COUNT ANALYSIS
+=============================================
+
+---------------------------------------------
+ Role: chronlog  (18 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc                 4          6          8
+exec.shm                      4          6          8
+exec.tmp                      4          6          8
+exec.vartmp                   4          6          8
+fim.boot                      4          6          8
+fim.cron                     24         36         48
+fim.delete                  527        544        544
+fim.identity                 16         24         32
+fim.kernel                    4          6          8
+fim.owner                     8         12         16
+fim.perm                      8         12         16
+fim.ssh                       4          6          8
+fim.sudo                      8         12         16
+fim.systemd                   8         12         16
+fim.usrbin                    4          6          8
+fim.usrsbin                   4          6          8
+
+TOTAL (events)              635        706        760
+
+---------------------------------------------
+ Role: logforwarder  (1 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc                 6          6          6
+exec.shm                      6          6          6
+exec.tmp                      6          6          6
+exec.vartmp                   6          6          6
+fim.boot                      6          6          6
+fim.cron                     36         36         36
+fim.delete                  544        544        544
+fim.identity                 24         24         24
+fim.kernel                    6          6          6
+fim.owner                    12         12         12
+fim.perm                     12         12         12
+fim.ssh                       6          6          6
+fim.sudo                     12         12         12
+fim.systemd                  12         12         12
+fim.usrbin                    6          6          6
+fim.usrsbin                   6          6          6
+
+TOTAL (events)              706        706        706
+
+---------------------------------------------
+ Role: nes  (2 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc                 6          6          6
+exec.shm                      6          6          6
+exec.tmp                      6          6          6
+exec.vartmp                   6          6          6
+fim.boot                      6          6          6
+fim.cron                     36         36         36
+fim.delete                  537        540        544
+fim.identity                 24         24         24
+fim.kernel                    6          6          6
+fim.owner                    12         12         12
+fim.perm                     12         12         12
+fim.ssh                       6          6          6
+fim.sudo                     12         12         12
+fim.systemd                  12         12         12
+fim.usrbin                    6          6          6
+fim.usrsbin                   6          6          6
+
+TOTAL (events)              699        702        706
+
+---------------------------------------------
+ Role: secpxy  (2 host(s))
+---------------------------------------------
+
+KEY                     MIN/day MEDIAN/day    MAX/day
+---                     ------- ----------    -------
+exec.priv_esc                 4          5          6
+exec.shm                      4          5          6
+exec.tmp                      4          5          6
+exec.vartmp                   4          5          6
+fim.boot                      4          5          6
+fim.cron                     24         30         36
+fim.delete                  533        535        537
+fim.identity                 16         20         24
+fim.kernel                    4          5          6
+fim.owner                     8         10         12
+fim.perm                      8         10         12
+fim.ssh                       4          5          6
+fim.sudo                      8         10         12
+fim.systemd                   8         10         12
+fim.usrbin                    4          5          6
+fim.usrsbin                   4          5          6
+
+TOTAL (events)              641        670        699
+
+
+=============================================
+ SECTION 2: SIZE (BYTES) ANALYSIS
 =============================================
 
 ---------------------------------------------
@@ -117,9 +226,14 @@ TOTAL (GB/month)           0.01       0.01       0.01
  Fleet-wide Projection
 =============================================
 
-Total hosts:     23
-Combined daily:  8.92 MB/day
-Combined monthly: 0.26 GB/month (30-day)
+Total hosts:         23
 
-Average per host: 0.39 MB/day
+--- Events ---
+Combined daily:      16198 events/day
+Average per host:    704 events/day
+
+--- Size ---
+Combined daily:      8.92 MB/day
+Combined monthly:    0.26 GB/month (30-day)
+Average per host:    0.39 MB/day
 
